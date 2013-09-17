@@ -1,0 +1,26 @@
+// impuesto.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	float sueldo,sueldobase,impuesto;
+		cout<<"ingrese el monto de su sueldo: ";
+	    cin>> sueldo;
+		cout<<"ingrese el monto del sueldo base: ";
+		cin>> sueldobase;
+        if(sueldo>2*sueldobase)
+			impuesto=sueldo*0.13;
+		else
+		    impuesto=0;
+			cout<<"el impuesto de su sueldo es: "
+				<<impuesto;
+    		
+		getch();
+	return 0;
+}
+
