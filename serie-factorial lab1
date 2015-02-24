@@ -1,0 +1,40 @@
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+#include "math.h"
+using namespace std;
+
+float serie (float x, int N);
+int FAC(int a);
+
+void main(){
+	float X,sol;
+	int N;
+	cout<<"ingrese el valor X: ";
+	cin>> X;
+	cout<<"ingrese el valor N: ";
+	cin>> N;
+	sol= serie(X,N);
+	cout<<" la respuesta de la serie es: " << sol;
+	getch();
+}
+
+float serie (float x,int N){
+	int sig,i;
+	float s;
+	sig=1;
+	s=0;
+	for(int i=1;i<=N;i++){
+		s=s+sig*pow(x,i)/FAC(i);
+		sig= sig*(-1);
+	}
+	return(s);
+}
+
+int FAC(int a){
+	int b=1;
+	for(int i=1;i<=a;i++){
+		b=b*i;
+	}
+	return(b);
+}
