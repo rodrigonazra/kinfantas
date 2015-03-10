@@ -1,0 +1,58 @@
+//RODRIGO NAZRA PLANILLA DE SUELDOS !
+#include "conio.h"
+#include <iostream>
+#define TAM 30
+#define salariominimo 1400
+
+using namespace std;
+void cargarvector(float salariobruto[],int n);
+float calcularsalarioneto (float salarioneto[],float salariobruto[],int n);
+float promedio(float salarioneto[],int n);
+void planilla(float salariobruto[],float salarioneto[],float promerio,int n);
+
+
+void main()
+{
+int n;
+float sb[TAM],sn[TAM],z;
+cout<<"Ingrese el numero de empleados";
+cin>>n;
+cargarvector(sb,n);
+calcularsalarioneto(sn,sb,n);
+z=promedio(sn,n);
+planilla(sb,sn,z,n);
+cout<<"el promedio es :"<<z;
+_getch();
+}
+
+void cargarvector(float salariobruto[], int n)
+{
+ for(int i=0;i<=n;i++)
+	{cout<<"Ingrese el salario bruto"<<endl<<"v["<<i<<"]=";
+	 cin>>salariobruto[i];
+    }
+}
+
+   
+
+void calculosalarioneto(float salarioneto[],float salariobruto[], int n)
+{   
+    for(int i=1;i<=n;i++)
+	{
+		salarioneto[i]=salariobruto[i]-(salariobruto[i]*0.13)-(salariobruto[i]*0.121);
+	}
+}
+	
+
+
+
+float promedio (float salarioneto[],int n)
+{
+	float z=0;
+	for (int i=0;i<n;i++)
+	{
+		z=z+salarioneto[i];
+	}
+	float s=z/n;
+	return (s);
+}
