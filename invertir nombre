@@ -15,7 +15,7 @@ int main()
    string nombres[tam],nombre,apellido;
    unsigned int encontro;
    do{
-	 cout<<"ingrese el numero de nombrs: ";
+	 cout<<"ingrese el numero de nombres: ";
 	 cin>>total;
    }while(!(total <= tam));
 
