@@ -1,0 +1,81 @@
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+#include "stdio.h"
+#define tam 100
+
+using namespace std;
+
+
+void main()
+{int opcion;
+	do
+	{cout<<endl<<endl<<"********MENU********: ";
+	 cout<<endl<<"1.-Mostrar un ejemplo de funcion: ";
+	 cout<<endl<<"2.-Mostrar un ejemplo de vector: ";
+	 cout<<endl<<"3.-Mostrar un ejemplo de matriz: ";
+	 cout<<endl<<"4.-Mostrar un ejemplo de menu: ";
+	 cout<<endl<<"5.-Salir \n: ";
+	 cin>>opcion;
+	 switch(opcion)
+	 {
+	 case 1: funcion; 
+			 {cout<<"\n divisor ";
+
+
+		 break;
+	 case 2: vector;
+		 cargar_vector(v,a,b);
+		 mostrar_vector(v,a,b);
+
+		 break;
+	 case 3:
+		 break;
+	 case 4:
+		 break;
+	 }
+	}while(opcion!=0);
+	getch();
+}
+
+
+void mostrarfuncion(int n)
+{int s,x,promedio;
+ s=promedio(x);
+ cout<<"Mostrar el promedio: "<<s; 
+}
+
+float promedio(int t)
+{int prom,n;
+ cout<<"ingrese el numero de personas: ";
+ cin>>n;
+ prom=t/n;
+ return(prom);
+}
+
+void mostrar_matriz(int M[][],int n,int m)
+{int i,j,n=3,m=3;
+ for(i=0;i<n;i++)
+  {for(j=0;j<m;j++)
+   {cout<<"elemento: ";
+    cout>>M[i][j];
+   }
+  }
+}
+
+
+void cargar_vec(V[],int n)
+{int i;
+ for(i=0;i<n;i++)
+ {cout<<"ingrese digito: ";
+  cin>>V[i];
+ }
+}
+
+void mostrar_vector(int V[],int &a,int &b)
+{int i;
+ for (i=0;i<tam;i++)
+ {cout<<"mostrar vec: "<<V[i];
+ }
+}
+  
