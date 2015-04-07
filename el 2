@@ -1,0 +1,34 @@
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>;
+
+using namespace std;
+
+int digimpar(int nro)
+{int s=0,num,d;
+ num=nro;
+ while(nro>0)
+  {d=nro%10;
+   if(d%2!=0)
+    {s=s+d;
+    }
+   nro=nro/10;
+  }
+ return(s);
+}
+
+
+void cargarsumaimp(int vecA[],int tam,int vecB[],int &m)
+{   int vec[100],n;
+	for(int i=0;i<tam;i++)
+	{vecB[i]=digimpar(vecA[i]);
+	}
+	cout<<"el nuevo vector es:"  <<mostrar_vec(vec,n);
+}
+void mostrar_vec(int vec[],int n)
+{
+	for(int i=0;i<n;i++)
+	{
+	 cout<<"mostrar vec"<<vec[i];
+	}
+}
