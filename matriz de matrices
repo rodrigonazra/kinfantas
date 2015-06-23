@@ -1,0 +1,69 @@
+//Rodrigo Nazra 
+
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+
+#define fil 10	
+#define col 10 
+
+using namespace std;
+
+struct matrizdematriz
+{
+	int	M[fil][col];
+};
+
+void cargar_matrizx2(matrizdematriz mat[fil][col], int M, int N,int m,int n );
+void mostrar(matrizdematriz mat[fil][col], int M, int N, int m, int n);
+
+void main()
+{
+	int m, n, M, N;
+	matrizdematriz mat[fil][col];
+
+	cout << "ingrese numero de filas de la matriz externa: ";
+	cin >> M;
+	cout << "ingrese numero de columnas de la matriz externa: ";
+	cin >> N;
+	cout << "ingrese numero de filas de la matriz interna: ";
+	cin >> m;
+	cout << "ingrese numero de filas de la matriz interna: ";
+	cin >> n;
+	cargar_matrizx2(mat, M, N, m, n);
+	mostrar(mat, M, N, m, n);
+	_getch();
+}
+void cargar_matrizx2(matrizdematriz mat[fil][col], int M, int N, int m, int n)
+{
+	for (int i=0; i < M; i++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			for (int k = 0; k < m; k++)
+			{
+				for (int l = 0; l < n; l++)
+				{
+					cout << "ingese dato [" << i << "]" << "[" << j << "]" << ".[" << k << "]" << "[" << l << "]" << endl;
+					cin >> mat[i][j].M[k][l];
+				}
+			}
+		}
+	}
+}
+void mostrar(matrizdematriz mat[fil][col], int M, int N, int m, int n)
+{
+	for (int i = 0; i < M; i++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			for (int k = 0; k < m; k++)
+			{
+				for (int l = 0; l < n; l++)
+				{
+					cout << "[" << i<< "]" << "[" << j << "]" << ".[" << k << "]" << "[" << l << "]= " <<mat[i][j].M[k][l];
+				}
+			}cout << endl;
+		}
+	}cout << endl;
+}
