@@ -1,0 +1,68 @@
+#include"stdafx.h"
+#include"math.h"
+#include"conio.h"
+#include <iostream>
+#include <string>
+#define TAM 90
+
+using namespace std;
+
+
+void cargar(float v[],string a[],int n);
+void ordenarvector(float v[],string a[],int n);
+void mostrar(float v[],string a[],int n);
+
+
+void main()
+{float v[TAM];
+string b[TAM];
+int n;
+cout<<"Ingrese el numero de clientes\n";
+cin>>n;
+cargar(v,b,n);
+ordenarvector(v,b,n);
+mostrar(v,b,n);
+_getch();
+}
+
+void cargar(float v[],string a[],int n)
+ { for(int i=0;i<n;i++)
+    { cout<<"ingrese monto Nro:\n"<<i+1<<endl;
+         cin>>v[i];
+        cout<<"ingrese nombre del cliente Nro:\n"<<i+1<<endl;
+	    cin.ignore();
+	    getline(cin,a[i]);
+  }
+}
+void ordenarvector(float v[],string a[],int n)
+{
+	int i,j,aux1;
+	string aux2;
+    for(i=0;i<n-1;i++)
+	
+	{  for(j=0;j<n-i-1;j++) 
+	  { 
+		  if(v[j]>v[j+1])
+	        {    aux1=v[j];
+		         aux2=a[j];
+				 a[j]=a[j+1];
+				 a[j+1]=aux2;
+	             v[j]=v[j+1];
+				 v[j+1]=aux1;
+	       }
+			}
+		 }
+}
+
+
+void mostrar(float v[],string a[],int n)
+{       cout<<"\t PLANILLA";
+        cout<<"\t             "<<endl;
+		cout<<"----------------------------------\n";
+        cout<<"nro\t Nombre \t Credito "<<endl;
+	for(int i=0;i<n;i++)
+	{cout<<i+1<<"\t"<<a[i]<<"\t\t"<<v[i]<<endl;
+	
+	cout<<"\n";
+	}
+}
