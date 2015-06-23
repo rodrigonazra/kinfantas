@@ -1,0 +1,113 @@
+#include "stdafx.h"
+#include "conio.h"
+#include "math.h"
+#include <iostream>
+#define TAM 70
+using namespace std;
+
+void cargarmatriz(float matriz[TAM][TAM],int n,int m);
+void mostrarmatriz(float matriz[TAM][TAM],int n,int m);
+float sumardiagonal(float matriz[TAM][TAM],int n,int m);
+float promedio(float matriz[TAM][TAM],int n,int m);
+
+void main()
+{float matriz[TAM][TAM],p,s;
+int n,m,op;
+cout<<"Digite numero de filas\n";
+	cin>>n;
+	cout<<"Digite numero de columnas\n";
+	cin>>m;
+	do
+	{
+	cout<<"-----MENU------\n";
+	cout<<"1.a)- Cargar Matriz\n";
+	cout<<"2.b)- Sumar la diagonal\n";
+	cout<<"3.c)- Mostrar la matriz\n";
+	cout<<"4.d)- Calcular promedio\n";
+	cout<<"5.e)- salir\n";
+	cout<<"\n------------ESCOGER UNA OPCION--------\n";
+	cin>>op;
+		switch(op)
+	{
+	case (1):
+	{cargarmatriz(matriz,n,m);
+	cout<<"\n";
+	break;
+	}
+	case (2):
+	{
+			if(n==m)
+		{			s=sumardiagonal(matriz,n,m);
+			cout<<"La suma es : "<<s;
+			cout<<"\n";
+		break;
+	}
+	else 
+		cout<<"La matriz no es cuadrada y no se puede sumar\n";
+			cout<<"\n";
+	break;
+	}
+	case (3):
+	{	
+	mostrarmatriz(matriz,n,m);
+	cout<<"\n";
+	break;
+}
+	case (4):
+	{
+	p=promedio(matriz,n,m);
+  cout<<"el promedio es "<<p;
+  cout<<"\n";
+  break;
+	}
+		}
+	}while(!(op==5));
+  _getch();
+
+}
+	 
+
+void cargarmatriz(float matriz[TAM][TAM],int n,int m)
+{	
+	for(int j=1;j<=n;j++)
+	{		for(int k=1;k<=m;k++)
+			{	
+				cout<<"Introduzca el elemento ["<<j<<","<<k<<"]\n";
+				cin>>matriz[j][k];
+				}		
+		}
+}
+
+
+void mostrarmatriz(float matriz[TAM][TAM],int n,int m)
+{	
+	for(int j=1;j<=n;j++)
+    { cout<<"\n";
+		for(int k=1; k<=m;k++)
+
+			{ cout<<" "<<matriz[j][k];
+			}	 
+	}
+}
+
+float sumardiagonal(float matriz[TAM][TAM],int n,int m)
+{float s=0;
+	for(int j=1;j<=n;j++)
+	{		for(int k=1;k<=m;k++)
+			{	if(j==k)
+			s=s+matriz[j][k];
+
+			}		
+		}
+	return s;
+}
+
+float promedio(float matriz[TAM][TAM],int n,int m)
+{float p;int s=0;
+for(int j=1;j<=n;j++)
+	{		for(int k=1;k<=m;k++)
+			s=s+matriz[j][k];			
+	}
+p=s/(n*m);
+return p;
+}
