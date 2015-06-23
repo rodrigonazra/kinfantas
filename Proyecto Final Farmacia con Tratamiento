@@ -1,0 +1,1696 @@
+Source Principal
+
+#include <stdio.h>
+#include <iostream>
+#include <stdlib.h>
+#include <conio.h>
+#include <time.h>
+#include <string.h>
+using namespace std;
+#include "estructuras.h"
+#include "validacionesYfechas.h"
+#include "sucursal.h"
+#include "ptovta.h"
+#include "producto.h"
+#include "vendedor.h"
+#include "cliente.h"
+#include "venta.h"
+#include "reporteSucursal.h"
+#include "Tratamiento.h"
+
+
+
+int main(){
+int opcion;
+int id;
+regTratamiento regT;
+char contra[20];
+regVendedor regV;
+int rev;
+do{
+	/*do
+	{
+	cout<<"Introduzca Id De usuario: "<<endl;
+	cin>>id;
+	regV=verificarContrasenha(id);
+	cout<<"Introduzca contrasenha: "<<endl;
+	do
+	{
+	gets(contra);
+
+	}while(strlen(contra)==0);
+	fflush(stdin);
+	rev=strcmp(regV.contrasenha,contra);
+
+	}while(rev!=0);
+	*/
+	
+		system("cls");
+		cout << "**		F A R M A C I A    **" << endl;
+		cout << "1. Sucursal" << endl;
+		cout << "2. Punto de Venta" << endl;
+		cout << "3. Producto" << endl;
+		cout << "4. Vendedores" << endl;
+		cout << "5. Cliente" << endl;
+		cout << "6. Venta  " << endl;
+		cout << "7. Reporte  " << endl;
+		cout << "8. Tratamiento " << endl;
+
+		alarma(regT);
+
+		cout << endl;
+		cout << "opcion: ";
+		cin >> opcion;
+		switch (opcion){
+		case 1: menusucursal(); break;
+		case 2:menuptovta(); break;
+		case 3:menuproducto(); break;
+		case 4:menuvendedor(); break;
+		case 5:menucliente(); break;
+		case 6:menuventa(); break;
+		case 7:	reporte(); break;
+		case 8:menutratamiento(); break;
+		getch();
+
+		}
+	}while (opcion != 0);
+
+	getch();
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Estructuras
+struct regProducto{
+int IdProd;
+char nombre[30];
+int stock;
+float precio;
+char estado;
+};
+struct regSucursal{
+int IdSucursal;
+char nombre[30];
+char direccion[50];
+char estado;
+};
+struct regPtoDeVenta{
+int IdPtoVta;
+char nombre[30];
+int IdSucursal;
+int IdVend;
+char estado;
+};
+struct regVendedor{
+int IdVend;
+char nombre[30];
+char telefono[15];
+char email[20];
+char estado;
+char contrasenha[20];
+};
+struct regTratamiento{
+int IdTrat;
+int IdCliente;
+char estado;
+char NomTratamiento[30];
+double hora;
+double minutos;
+};
+struct regCliente{
+int IdCliente;
+char nombre[30];
+char telefono[15];
+char email[50];
+char NIT[15];
+char estado;
+};
+struct regVenta{
+int IdVenta;
+char fecha[10];
+int IdCliente;
+int IdVendedor;
+int IdProd;
+int cantidad;
+float PrecioTotal;
+char estado;
+};
+
+Sucursal
+
+void crearArchivosuc(char nomArch[15]){
+FILE *ptr;
+ptr=fopen(nomArch,"wb+");
+fclose(ptr);
+}
+
+
+void solicitarDatossuc(regSucursal *reg){
+		cout<<"IdSucursal: ";
+		cin>>reg->IdSucursal;
+
+	cout<<endl<<"Introducir Nombre: ";
+	do{
+		gets(reg->nombre);
+	}while(strlen(reg->nombre)==0);
+
+
+
+		cout<<"direccion: ";
+		do{
+		gets(reg->direccion);
+	}while(strlen(reg->direccion)==0);
+		reg->estado='N';
+	
+
+}
+
+void mostrarRegistrosuc(regSucursal reg,int nroReg){
+	cout<<endl<<nroReg<<".- "<<reg.IdSucursal<<"     "<<reg.nombre<<"     "<<reg.direccion;
+}
+
+void adicionarRegistrosuc(char nomArch[15]){
+//adiciona un registro al final del archivo
+FILE *ptr;
+ptr=fopen(nomArch,"ab");
+regSucursal reg;
+solicitarDatossuc(&reg);
+fwrite(&reg,sizeof(struct regSucursal),1,ptr);
+fclose(ptr);
+}
+
+void listarArchivosuc(char nomArch[15]){
+//muestra todo contenido del archivo
+FILE *ptr;
+regSucursal reg;
+int cont=0;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL)cout<<"El archivo no existe...";
+else{
+system("cls");
+cout<<endl<<"***            SUCURSALES             ***";
+cout<<endl<<"  Idsucursal       Nombre       Direccion";
+cout<<endl<<"=========================================";
+fread(&reg,sizeof(struct regSucursal),1,ptr);
+while(!feof(ptr)){
+	if(reg.estado=='N') mostrarRegistrosuc(reg,cont+1);
+	fread(&reg,sizeof(struct regSucursal),1,ptr);
+	cont++;
+}
+fclose(ptr); getch();
+}
+}
+
+void buscarRegistrosuc(char nomArch[15],int nroReg){
+//muestra un registro del contenido del archivo
+FILE *ptr;
+regSucursal reg;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL) cout<<"El archivo no existe...";
+else{
+	fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+	fread(&reg,sizeof(struct regSucursal),1,ptr);
+	if(feof(ptr)) cout<<"registro no existe";
+	else if(reg.estado='N') mostrarRegistrosuc(reg,nroReg);
+	else cout<<endl<<"Registro eliminado....";
+fclose(ptr); getch();
+}
+}
+void modificarRegistrosuc(char nomArch[15],int nroReg){
+//modificar el contenido d eun registro del archivo
+FILE *ptr;
+regSucursal reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"el archivo no existe....";
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regSucursal),1,ptr);
+if(feof(ptr)) cout<<"el registro no existe...";
+else if(reg.estado=='N') {
+mostrarRegistrosuc(reg,nroReg);
+cout<<endl;
+solicitarDatossuc(&reg);
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regSucursal),1,ptr);
+}
+else cout<<"Registro Eliminado....";
+fclose(ptr);
+}
+getch();
+}
+
+void eliminarRegistrosuc(char nomArch[15],int nroReg){
+//elimina un registro del archivo
+FILE *ptr;
+regSucursal reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"El archivo no existe..."; 
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regSucursal),1,ptr);
+if(feof(ptr)) cout<<"registro no existe...";
+else if(reg.estado=='N'){
+mostrarRegistrosuc(reg,nroReg);
+reg.estado='S';
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regSucursal),1,ptr);
+cout<<endl<<"Registro eliminado exitosamente...";
+}
+else cout<<endl<<"Registro YA eliminado...";
+fclose(ptr);
+}
+getch();
+}
+
+
+void menusucursal(){
+int opcion=0,nreg=0;
+do{
+system("cls");
+cout<<"\n** M E N U   S U C U R S A L **"<<endl;
+cout<<"\n1.- crear archivo"<<endl;
+cout<<"\n2.- Adicionar Registro"<<endl;
+cout<<"\n3.- Modificar Registro"<<endl;
+cout<<"\n4.- Eliminar Registro"<<endl;
+cout<<"\n5.- Buscar por numero de registro"<<endl;
+cout<<"\n6.- Listar todo el archivo"<<endl;
+cout<<"\n0.- Salir"<<endl;
+cin>>opcion;
+switch(opcion){
+case 1: crearArchivosuc("sucursal.dat"); break;
+case 2: adicionarRegistrosuc("sucursal.dat"); break;
+case 3: cout<<"\nIntroducir nro de registro a modificar : "; cin>>nreg; modificarRegistrosuc("sucursal.dat",nreg); break;
+case 4: cout<<"\nIntroducir nro de registro a Eliminar : "; cin>>nreg; eliminarRegistrosuc("sucursal.dat",nreg);break;
+case 5: cout<<"\nIntroducir nro de registro a Buscar : "; cin>>nreg; buscarRegistrosuc("sucursal.dat",nreg); break;
+case 6: listarArchivosuc("sucursal.dat");break;
+}
+}while(opcion!=0);
+
+}
+
+
+
+
+
+
+
+
+Puntos de Ventas
+
+
+void crearArchivoptovta(char nomArch[15]){
+FILE *ptr;
+ptr=fopen(nomArch,"wb+");
+fclose(ptr);
+}
+
+
+void solicitarDatosptovta(regPtoDeVenta *reg){
+	cout<<endl<<"Id punto de venta: ";
+		cin>>reg->IdPtoVta;
+		cout<<"Nombre: ";
+		do{
+		gets(reg->nombre);
+	}while(strlen(reg->nombre)==0);
+cout<<"Id Sucursal: ";
+		cin>>reg->IdSucursal;
+	
+	cout<<"Id Vendedor: ";
+		cin>>reg->IdVend;
+
+
+		reg->estado='N';
+}
+
+void mostrarRegistroptovta(regPtoDeVenta reg,int nroReg){
+	cout<<endl<<nroReg<<".- "<<reg.IdPtoVta<<"     "<<reg.nombre<<"    "<<reg.IdVend<<"         5    "<<reg.IdSucursal;
+}
+
+void adicionarRegistroptovta(char nomArch[15]){
+//adiciona un registro al final del archivo
+FILE *ptr;
+ptr=fopen(nomArch,"ab");
+regPtoDeVenta reg;
+solicitarDatosptovta(&reg);
+fwrite(&reg,sizeof(struct regPtoDeVenta),1,ptr);
+fclose(ptr);
+}
+
+void listarArchivoptovta(char nomArch[15]){
+//muestra todo contenido del archivo
+FILE *ptr;
+regPtoDeVenta reg;
+int cont=0;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL)cout<<"El archivo no existe...";
+else{
+system("cls");
+cout<<endl<<"***           PUNTOS DE VENTA           ***";
+cout<<endl<<"IdPtoVta  Nombre  IdVendedor IdSucursal";
+cout<<endl<<"===========================================";
+fread(&reg,sizeof(struct regPtoDeVenta),1,ptr);
+while(!feof(ptr)){
+	if(reg.estado=='N') mostrarRegistroptovta(reg,cont+1);
+	fread(&reg,sizeof(struct regPtoDeVenta),1,ptr);
+	cont++;
+}
+fclose(ptr); getch();
+}
+}
+
+void buscarRegistroptovta(char nomArch[15],int nroReg){
+//muestra un registro del contenido del archivo
+FILE *ptr;
+regPtoDeVenta reg;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL) cout<<"El archivo no existe...";
+else{
+	fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+	fread(&reg,sizeof(struct regPtoDeVenta),1,ptr);
+	if(feof(ptr)) cout<<"registro no existe";
+	else if(reg.estado='N') mostrarRegistroptovta(reg,nroReg);
+	else cout<<endl<<"Registro eliminado....";
+fclose(ptr); getch();
+}
+}
+void modificarRegistroptovta(char nomArch[15],int nroReg){
+//modificar el contenido d eun registro del archivo
+FILE *ptr;
+regPtoDeVenta reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"el archivo no existe....";
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regPtoDeVenta),1,ptr);
+if(feof(ptr)) cout<<"el registro no existe...";
+else if(reg.estado=='N') {
+mostrarRegistroptovta(reg,nroReg);
+cout<<endl;
+solicitarDatosptovta(&reg);
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regPtoDeVenta),1,ptr);
+}
+else cout<<"Registro Eliminado....";
+fclose(ptr);
+}
+getch();
+}
+
+void eliminarRegistroptovta(char nomArch[15],int nroReg){
+//elimina un registro del archivo
+FILE *ptr;
+regPtoDeVenta reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"El archivo no existe..."; 
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regPtoDeVenta),1,ptr);
+if(feof(ptr)) cout<<"registro no existe...";
+else if(reg.estado=='N'){
+mostrarRegistroptovta(reg,nroReg);
+reg.estado='S';
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regPtoDeVenta),1,ptr);
+cout<<endl<<"Registro eliminado exitosamente...";
+}
+else cout<<endl<<"Registro YA eliminado...";
+fclose(ptr);
+}
+getch();
+}
+
+void menuptovta(){
+int opcion=0,nreg=0;
+do{
+system("cls");
+cout<<"\n** M E N U   P U N T O   D E   V E N T A **"<<endl;
+cout<<"\n1.- crear archivo"<<endl;
+cout<<"\n2.- Adicionar Registro"<<endl;
+cout<<"\n3.- Modificar Registro"<<endl;
+cout<<"\n4.- Eliminar Registro"<<endl;
+cout<<"\n5.- Buscar por numero de registro"<<endl;
+cout<<"\n6.- Listar todo el archivo"<<endl;
+cout<<"\n0.- Salir"<<endl;
+cin>>opcion;
+switch(opcion){
+case 1: crearArchivoptovta("ptovta.dat"); break;
+case 2: adicionarRegistroptovta("ptovta.dat"); break;
+case 3: cout<<"\nIntroducir nro de registro a modificar : "; cin>>nreg; modificarRegistroptovta("ptovta.dat",nreg); break;
+case 4: cout<<"\nIntroducir nro de registro a Eliminar : "; cin>>nreg; eliminarRegistroptovta("ptovta.dat",nreg);break;
+case 5: cout<<"\nIntroducir nro de registro a Buscar : "; cin>>nreg; buscarRegistroptovta("ptovta.dat",nreg); break;
+case 6: listarArchivoptovta("ptovta.dat");break;
+}
+}while(opcion!=0);
+
+}
+
+
+
+
+
+
+
+
+
+
+Producto
+void crearArchivoprod(char nomArch[15]){
+FILE *ptr;
+ptr=fopen(nomArch,"wb+");
+fclose(ptr);
+}
+
+
+void solicitarDatosprod(regProducto *reg){
+		cout<<"IdProd: ";
+		cin>>reg->IdProd;
+
+	cout<<endl<<"Nombre: ";
+	do{
+		gets(reg->nombre);
+	}while(strlen(reg->nombre)==0);
+
+	cout<<"Stock: ";
+		cin>>reg->stock;
+
+			cout<<"Precio: ";
+		cin>>reg->precio;
+
+		reg->estado='N';
+	
+
+}
+
+void mostrarRegistroprod(regProducto reg,int nroReg){
+	cout<<endl<<nroReg<<".- "<<reg.IdProd<<"     "<<reg.nombre<<"    "<<reg.stock<<"    "<<reg.precio;
+}
+
+void adicionarRegistroprod(char nomArch[15]){
+//adiciona un registro al final del archivo
+FILE *ptr;
+ptr=fopen(nomArch,"ab");
+regProducto reg;
+solicitarDatosprod(&reg);
+fwrite(&reg,sizeof(struct regProducto),1,ptr);
+fclose(ptr);
+}
+
+void listarArchivoprod(char nomArch[15]){
+//muestra todo contenido del archivo
+FILE *ptr;
+regProducto reg;
+int cont=0;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL)cout<<"El archivo no existe...";
+else{
+system("cls");
+cout<<endl<<"***           PRODUCTOS           ***";
+cout<<endl<<"  IdProd    Nombre   Stock     Precio";
+cout<<endl<<"=====================================";
+fread(&reg,sizeof(struct regProducto),1,ptr);
+while(!feof(ptr)){
+	if(reg.estado=='N') mostrarRegistroprod(reg,cont+1);
+	fread(&reg,sizeof(struct regProducto),1,ptr);
+	cont++;
+}
+fclose(ptr);getch();
+}
+}
+
+void buscarRegistroprod(char nomArch[15],int nroReg){
+//muestra un registro del contenido del archivo
+FILE *ptr;
+regProducto reg;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL) cout<<"El archivo no existe...";
+else{
+	fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+	fread(&reg,sizeof(struct regPtoDeVenta),1,ptr);
+	if(feof(ptr)) cout<<"registro no existe";
+	else if(reg.estado='N') mostrarRegistroprod(reg,nroReg);
+	else cout<<endl<<"Registro eliminado....";
+fclose(ptr); getch();
+}
+}
+
+
+void modificarRegistroprod(char nomArch[15],int nroReg){
+//modificar el contenido d eun registro del archivo
+FILE *ptr;
+regProducto reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"el archivo no existe....";
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regProducto),1,ptr);
+if(feof(ptr)) cout<<"el registro no existe...";
+else if(reg.estado=='N') {
+mostrarRegistroprod(reg,nroReg);
+cout<<endl;
+solicitarDatosprod(&reg);
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regProducto),1,ptr);
+}
+else cout<<"Registro Eliminado....";
+fclose(ptr);
+}
+}
+
+void eliminarRegistroprod(char nomArch[15],int nroReg){
+//elimina un registro del archivo
+FILE *ptr;
+regProducto reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"El archivo no existe..."; 
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regProducto),1,ptr);
+if(feof(ptr)) cout<<"registro no existe...";
+else if(reg.estado=='N'){
+mostrarRegistroprod(reg,nroReg);
+reg.estado='S';
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regProducto),1,ptr);
+cout<<endl<<"Registro eliminado exitosamente...";
+}
+else cout<<endl<<"Registro YA eliminado...";
+fclose(ptr); 
+}
+getch();
+}
+
+
+void menuproducto(){
+int opcion=0,nreg=0;
+do{
+system("cls");
+cout<<"\n** M E N U   P R O D U C T O**"<<endl;
+cout<<"\n1.- crear archivo"<<endl;
+cout<<"\n2.- Adicionar Registro"<<endl;
+cout<<"\n3.- Modificar Registro"<<endl;
+cout<<"\n4.- Eliminar Registro"<<endl;
+cout<<"\n5.- Buscar por numero de registro"<<endl;
+cout<<"\n6.- Listar todo el archivo"<<endl;
+cout<<"\n0.- Salir"<<endl;
+cout << "opcion: ";
+cin>>opcion;
+switch(opcion){
+case 1: crearArchivoprod("producto.dat"); break;
+case 2: adicionarRegistroprod("producto.dat"); break;
+case 3: cout<<"\nIntroducir nro de registro a modificar : "; cin>>nreg; modificarRegistroprod("producto.dat",nreg); break;
+case 4: cout<<"\nIntroducir nro de registro a Eliminar : "; cin>>nreg; eliminarRegistroprod("producto.dat",nreg);break;
+case 5: cout<<"\nIntroducir nro de registro a Buscar : "; cin>>nreg; buscarRegistroprod("producto.dat",nreg); break;
+case 6: listarArchivoprod("producto.dat");break;
+}
+}while(opcion!=0);
+
+}
+
+
+
+
+
+
+
+
+Vendedores
+
+
+void listarArchivovend(char nomArch[15]){
+//muestra todo contenido del archivo
+FILE *ptr;
+regVendedor reg;
+int cont=0;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL)cout<<"El archivo no existe...";
+else{
+system("cls");
+cout<<endl<<"***             VENDEDORES                      *******************";
+cout<<endl<<"IdVend       Nombre         Telefono               E-mail";
+cout<<endl<<"===================================================================";
+fread(&reg,sizeof(struct regVendedor),1,ptr);
+while(!feof(ptr)){
+	if(reg.estado=='N') mostrarRegistrovend(reg,cont+1);
+	fread(&reg,sizeof(struct regVendedor),1,ptr);
+	cont++;
+}
+fclose(ptr); getch();
+}
+}
+void buscarRegistrovend(char nomArch[15],int nroReg){
+//muestra un registro del contenido del archivo
+FILE *ptr;
+regVendedor reg;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL) cout<<"El archivo no existe...";
+else{
+	fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+	fread(&reg,sizeof(struct regVendedor),1,ptr);
+	if(feof(ptr)) cout<<"registro no existe";
+	else if(reg.estado=='N') mostrarRegistrovend(reg,nroReg);
+	else cout<<endl<<"Registro eliminado....";
+fclose(ptr);
+}
+getch();
+}
+void modificarRegistrovend(char nomArch[15],int nroReg){
+//modificar el contenido d eun registro del archivo
+FILE *ptr;
+regVendedor reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"el archivo no existe....";
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regVendedor),1,ptr);
+if(feof(ptr)) cout<<"el registro no existe...";
+else if(reg.estado=='N') {
+mostrarRegistrovend(reg,nroReg);
+cout<<endl;
+solicitarDatosvend(&reg);
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regVendedor),1,ptr);
+}
+else cout<<"Registro Eliminado....";
+fclose(ptr);
+}
+getch();
+}
+void eliminarRegistrovend(char nomArch[15],int nroReg){
+FILE *ptr;
+regVendedor reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"El archivo no existe..."; 
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regVendedor),1,ptr);
+if(feof(ptr)) cout<<"registro no existe...";
+else if(reg.estado=='N'){
+mostrarRegistrovend(reg,nroReg);
+reg.estado='S';
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regVendedor),1,ptr);
+cout<<endl<<"Registro eliminado exitosamente...";
+}
+else cout<<endl<<"Registro YA eliminado...";
+fclose(ptr);
+}
+getch();
+}
+
+void menuvendedor(){
+int opcion=0,nreg=0;
+do{
+system("cls");
+cout<<"\n** M E N U   V E N D E D O R **"<<endl;
+cout<<"\n1.- crear archivo"<<endl;
+cout<<"\n2.- Adicionar Registro"<<endl;
+cout<<"\n3.- Modificar Registro"<<endl;
+cout<<"\n4.- Eliminar Registro"<<endl;
+cout<<"\n5.- Buscar por numero de registro"<<endl;
+cout<<"\n6.- Listar todo el archivo"<<endl;
+cout<<"\n0.- Salir"<<endl;
+cout<<endl;
+cout<<"opcion: ";
+cin>>opcion;
+switch(opcion){
+case 1: crearArchivovend("vendedor.dat"); break;
+case 2: adicionarRegistrovend("vendedor.dat"); break;
+case 3: cout<<"\nIntroducir nro de registro a modificar : "; cin>>nreg; modificarRegistrovend("vendedor.dat",nreg); break;
+case 4: cout<<"\nIntroducir nro de registro a Eliminar : "; cin>>nreg; eliminarRegistrovend("vendedor.dat",nreg);break;
+case 5: cout<<"\nIntroducir nro de registro a Buscar : "; cin>>nreg; buscarRegistrovend("vendedor.dat",nreg);break;
+case 6: listarArchivovend("vendedor.dat");break;
+}
+}while(opcion!=0);
+
+}
+Cliente
+
+void crearArchivocliente(char nomArch[15]){
+FILE *ptr;
+ptr=fopen(nomArch,"wb+");
+fclose(ptr);
+}
+bool validaremail(char cad[])
+{
+	int i = 0, j = 0, c = 0;
+	bool aceptar = true;
+	int punto = 0;
+	while (cad[i] != '\0')
+	{
+		if (cad[i] == 64)
+		{
+			if (((cad[i - 1] >= 65 && cad[i - 1] <= 90) || (cad[i - 1] >= 97 && cad[i - 1] <= 122) || (cad[i - 1] >= 48 && cad[i - 1] <= 57)) && ((cad[i + 1] >= 65 && cad[i + 1] <= 90) || (cad[i + 1] >= 97 && cad[i + 1] <= 122) || (cad[i + 1] >= 48 && cad[i + 1] <= 57)))
+			{
+				punto = 1;
+			}
+		}
+		i++;
+
+	}
+	if (punto == 1)
+	{
+		while (cad[j] != '\0'){
+			if (cad[j] == 46){
+				if (!(((cad[j - 1] >= 65 && cad[j - 1] <= 90) || (cad[j - 1] >= 97 && cad[j - 1] <= 122)) && ((cad[j + 1] >= 65 && cad[j + 1] <= 90) || (cad[j + 1] >= 97 && cad[j + 1] <= 122))))
+				{
+					aceptar = false;
+				}
+			}
+			j++;
+		}
+	}
+	if (punto == 1)
+	{
+		i = 0;
+		while (cad[i] != '\0'){
+			if (cad[i] == 64){
+				j = i;
+				while (cad[j] != '\0'){
+					if (cad[j] == 46){
+						c++;
+					}
+					j++;
+				}
+			}
+			i++;
+		}
+	}
+
+	if (punto == 0)
+	{
+		aceptar = false;
+	}
+	if (c == 0)
+	{
+		aceptar = false;
+	}
+
+	return(aceptar);
+}
+
+void solicitarDatoscliente(regCliente *reg){
+
+	cout<<"IdCliente: ";
+	cin>>reg->IdCliente;
+	fflush(stdin);
+
+	cout<<endl<<"Nombre: ";
+	do{fflush(stdin);
+		gets(reg->nombre);
+	}while(strlen(reg->nombre)==0);
+	fflush(stdin);
+
+	cout<<endl<<"Telefono: ";
+	do{
+		gets(reg->telefono);
+	}while(strlen(reg->telefono)==0);
+	fflush(stdin);
+	
+	cout<<endl<<"E-mail: ";
+	fflush(stdin);
+	do{
+		gets(reg->email);
+	} while (!validaremail(reg->email));
+					fflush(stdin);
+	cout<<endl<<"NIT: ";
+	fflush(stdin);
+	do{
+	   gets(reg->NIT);
+	}while(strlen(reg->NIT)==0);
+	fflush(stdin);
+	reg->estado='N';
+	
+}
+
+void mostrarRegistrocliente(regCliente reg,int nroReg){
+	cout<<endl<<nroReg<<".- "<<reg.IdCliente<<"     "<<reg.nombre<<"    "<<reg.telefono<<"    "<<reg.email<<"     "<<reg.NIT;
+}
+
+void adicionarRegistrocliente(char nomArch[15]){
+//adiciona un registro al final del archivo
+FILE *ptr;
+ptr=fopen(nomArch,"ab");
+regCliente reg;
+solicitarDatoscliente(&reg);
+fwrite(&reg,sizeof(struct regCliente),1,ptr);
+fclose(ptr);
+}
+
+void listarArchivocliente(char nomArch[15]){
+//muestra todo contenido del archivo
+FILE *ptr;
+regCliente reg;
+int cont=0;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL)cout<<"El archivo no existe...";
+else{
+	system("cls");
+cout<<endl<<"***                   CLIENTES                  ***";
+cout<<endl<<"  IdCliente    Nombre   Telefono     E-mail     NIT";
+cout<<endl<<"===================================================";
+fread(&reg,sizeof(struct regCliente),1,ptr);
+while(!feof(ptr)){
+	if(reg.estado=='N') mostrarRegistrocliente(reg,cont+1);
+	fread(&reg,sizeof(struct regCliente),1,ptr);
+	cont++;
+}
+fclose(ptr);
+getch ();
+}
+}
+
+void buscarRegistrocliente(char nomArch[15],int nroReg){
+//muestra un registro del contenido del archivo
+FILE *ptr;
+regCliente reg;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL) cout<<"El archivo no existe...";
+else{
+	fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+	fread(&reg,sizeof(struct regCliente),1,ptr);
+	if(feof(ptr)) cout<<"registro no existe";
+	else if(reg.estado='N') mostrarRegistrocliente(reg,nroReg);
+	else cout<<endl<<"Registro eliminado....";
+fclose(ptr); getch();
+}
+}
+void modificarRegistrocliente(char nomArch[15],int nroReg){
+//modificar el contenido d eun registro del archivo
+FILE *ptr;
+regCliente reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"el archivo no existe....";
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regCliente),1,ptr);
+if(feof(ptr)) cout<<"el registro no existe...";
+else if(reg.estado=='N') {
+mostrarRegistrocliente(reg,nroReg);
+cout<<endl;
+solicitarDatoscliente(&reg);
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regCliente),1,ptr);
+}
+else cout<<"Registro Eliminado....";
+fclose(ptr);
+}
+}
+
+void eliminarRegistrocliente(char nomArch[15],int nroReg){
+//elimina un registro del archivo
+FILE *ptr;
+regCliente reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"El archivo no existe..."; 
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regCliente),1,ptr);
+if(feof(ptr)) cout<<"registro no existe...";
+else if(reg.estado=='N'){
+mostrarRegistrocliente(reg,nroReg);
+reg.estado='S';
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regCliente),1,ptr);
+cout<<endl<<"Registro eliminado exitosamente...";
+}
+else cout<<endl<<"Registro YA eliminado...";
+fclose(ptr);
+}
+}
+
+void menucliente(){
+int opcion=0,nreg=0;
+do{
+system("cls");
+cout<<"\n** M E N U   C L I E N T E **"<<endl;
+cout<<"\n1.- crear archivo"<<endl;
+cout<<"\n2.- Adicionar Registro"<<endl;
+cout<<"\n3.- Modificar Registro"<<endl;
+cout<<"\n4.- Eliminar Registro"<<endl;
+cout<<"\n5.- Buscar por numero de registro"<<endl;
+cout<<"\n6.- Listar todo el archivo"<<endl;
+cout<<"\n0.- Salir"<<endl;
+cout<<endl;
+cout<<"opcion: ";
+cin>>opcion;
+switch(opcion){
+case 1: crearArchivocliente("cliente.dat"); break;
+case 2: adicionarRegistrocliente("cliente.dat"); break;
+case 3: cout<<"\nIntroducir nro de registro a modificar : "; cin>>nreg; modificarRegistrocliente("cliente.dat",nreg); break;
+case 4: cout<<"\nIntroducir nro de registro a Eliminar : "; cin>>nreg; eliminarRegistrocliente("cliente.dat",nreg);break;
+case 5: cout<<"\nIntroducir nro de registro a Buscar : "; cin>>nreg; buscarRegistrocliente("cliente.dat",nreg); break;
+case 6: listarArchivocliente("cliente.dat");break;
+}
+}while(opcion!=0);
+
+}
+Ventas
+
+void crearArchivoventa(char nomArch[15]){
+FILE *ptr;
+ptr=fopen(nomArch,"wb+");
+fclose(ptr);
+}
+
+
+float preciototal(int IdProd,int cantidad){ 
+	FILE *ptr;
+	regProducto reg;
+	ptr=fopen("producto.dat","rb");	
+	fread(&reg,sizeof(reg),1,ptr);
+	while(!feof(ptr) && (reg.IdProd!=IdProd) ){
+	fread(&reg,sizeof(reg),1,ptr);
+	}
+	return (reg.precio*cantidad);
+}
+
+
+
+void solicitarDatosventa(regVenta *reg){
+		cout<<"IdVenta: ";
+		cin>>reg->IdVenta;
+		//FECHA
+		SolicitarFecha(reg->fecha);
+		cout<<"IdCliente: ";
+		cin>>reg->IdCliente;
+		//verificar si el IdCliente existe
+		while(!verificarCliente(reg->IdCliente)){
+		cout<<"El IdProd no existe en el registro ingrese otro: ";
+		cin>>reg->IdCliente;
+		}
+
+		cout<<"IdVendedor ";
+		cin>>reg->IdVendedor;
+		//verificar si el IdVendedor existe
+		while(!verificarVendedor(reg->IdVendedor)){
+		cout<<"El IdVendedor no existe en el registro ingrese otro: ";
+		cin>>reg->IdCliente;
+		}
+
+		cout<<"IdProd: ";
+		cin>>reg->IdProd;
+		//verificar si el Idproducto existe
+		while(!verificarProducto(reg->IdProd)){
+		cout<<"El IdProd no existe en el registro ingrese otro: ";
+		cin>>reg->IdProd;
+		}
+
+		cout<<"cantidad: ";
+		cin>>reg->cantidad;
+
+	//precio total	
+	reg->PrecioTotal=preciototal(reg->IdProd,reg->cantidad);
+	reg->estado='N';
+}
+
+
+
+void mostrarRegistroventa(regVenta reg,int nroReg){
+	cout<<endl<<nroReg<<".- "<<reg.fecha<<"     "<<reg.IdVenta<<"     "<<reg.IdCliente<<"    "<<reg.IdVendedor<<"   "<<reg.IdProd<<"   "<<reg.cantidad<<"     "<<reg.PrecioTotal;
+}
+
+void adicionarRegistroventa(char nomArch[15]){
+//adiciona un registro al final del archivo
+FILE *ptr;
+ptr=fopen(nomArch,"ab");
+regVenta reg;
+solicitarDatosventa(&reg);
+fwrite(&reg,sizeof(struct regVenta),1,ptr);
+fclose(ptr);
+}
+
+void listarArchivosventa(char nomArch[15]){
+//muestra todo contenido del archivo
+FILE *ptr;
+regVenta reg;
+int cont=0;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL)cout<<"El archivo no existe...";
+else{
+system("cls");
+cout<<endl<<"***                          VENTAS                                        ***";
+cout<<endl<<"  Fecha    IdVenta     IdClien     IdVend    IdProd     cant      pTotal";
+cout<<endl<<"==============================================================================";
+fread(&reg,sizeof(struct regVenta),1,ptr);
+while(!feof(ptr)){
+	if(reg.estado=='N') mostrarRegistroventa(reg,cont+1);
+	fread(&reg,sizeof(struct regVenta),1,ptr);
+	cont++;
+}
+fclose(ptr); getch();
+}
+}
+
+void buscarRegistroventa(char nomArch[15],int nroReg){
+//muestra un registro del contenido del archivo
+FILE *ptr;
+regVenta reg;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL) cout<<"El archivo no existe...";
+else{
+	fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+	fread(&reg,sizeof(struct regVenta),1,ptr);
+	if(feof(ptr)) cout<<"registro no existe";
+	else if(reg.estado=='N') mostrarRegistroventa(reg,nroReg);
+	else cout<<endl<<"Registro eliminado....";
+fclose(ptr);
+}
+getch();
+}
+void modificarRegistroventa(char nomArch[15],int nroReg){
+//modificar el contenido d eun registro del archivo
+FILE *ptr;
+regVenta reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"el archivo no existe....";
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regVenta),1,ptr);
+if(feof(ptr)) cout<<"el registro no existe...";
+else if(reg.estado=='N') {
+mostrarRegistroventa(reg,nroReg);
+cout<<endl;
+solicitarDatosventa(&reg);
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regVenta),1,ptr);
+}
+else cout<<"Registro Eliminado....";
+fclose(ptr); 
+}
+getch();
+}
+
+void eliminarRegistroventa(char nomArch[15],int nroReg){
+//elimina un registro del archivo
+FILE *ptr;
+regVenta reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"El archivo no existe..."; 
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regVenta),1,ptr);
+if(feof(ptr)) cout<<"registro no existe...";
+else if(reg.estado=='N'){
+mostrarRegistroventa(reg,nroReg);
+reg.estado='S';
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regVenta),1,ptr);
+cout<<endl<<"Registro eliminado exitosamente...";
+}
+else cout<<endl<<"Registro YA eliminado...";
+fclose(ptr);
+}
+getch();
+}
+
+void menuventa(){
+int opcion=0,nreg=0;
+do{
+system("cls");
+cout<<"\n** M E N U      V E N T A **"<<endl;
+cout<<"\n1.- crear archivo"<<endl;
+cout<<"\n2.- Adicionar Registro"<<endl;
+cout<<"\n3.- Modificar Registro"<<endl;
+cout<<"\n4.- Eliminar Registro"<<endl;
+cout<<"\n5.- Buscar por numero de registro"<<endl;
+cout<<"\n6.- Listar todo el archivo"<<endl;
+cout<<"\n0.- Salir"<<endl;
+cin>>opcion;
+switch(opcion){
+case 1: crearArchivoventa("venta.dat"); break;
+case 2: adicionarRegistroventa("venta.dat"); break;
+case 3: cout<<"\nIntroducir nro de registro a modificar : "; cin>>nreg; modificarRegistroventa("venta.dat",nreg); break;
+case 4: cout<<"\nIntroducir nro de registro a Eliminar : "; cin>>nreg; eliminarRegistroventa("venta.dat",nreg);break;
+case 5: cout<<"\nIntroducir nro de registro a Buscar : "; cin>>nreg; buscarRegistroventa("venta.dat",nreg); break;
+case 6: listarArchivosventa("venta.dat");break;
+}
+}while(opcion!=0);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reportes
+
+int retornarposicionfecha(char fecha[]){
+	FILE *ptr;
+	regVenta reg;
+	int posicion=0;
+	ptr=fopen("venta.dat","rb");
+	if(ptr!=NULL){
+
+	fread(&reg,sizeof(reg),1,ptr);
+	while(!feof(ptr) &&  !strcmp(fecha,reg.fecha))
+	{
+		posicion++;
+		fread(&reg,sizeof(reg),1,ptr);
+		
+	}
+
+
+}
+	return posicion;
+}
+
+
+
+
+regVenta obtVentaPorPtoVta(int IdVenta){
+	FILE *ptr;
+	regVenta reg;
+ptr=fopen("venta.dat","rb");
+if(ptr!=NULL){
+fread(&reg,sizeof(reg),1,ptr);
+while(!feof(ptr) && reg.IdVenta!=IdVenta){
+	fread(&reg,sizeof(reg),1,ptr);
+}
+}
+return reg;
+fclose(ptr);
+
+}
+
+
+regPtoDeVenta obtPtoVtaPorVenta(int IdVend){
+	FILE *ptr;
+	regPtoDeVenta reg;
+ptr=fopen("ptovta.dat","rb");
+if(ptr!=NULL){
+fread(&reg,sizeof(reg),1,ptr);
+while(!feof(ptr) && reg.IdVend!=IdVend){
+	fread(&reg,sizeof(reg),1,ptr);
+}
+}
+return reg;
+fclose(ptr);
+}
+
+
+regVenta obtVentaPorProducto(int IdProd){
+	FILE *ptr;
+	regVenta reg;
+ptr=fopen("venta.dat","rb");
+if(ptr!=NULL){
+fread(&reg,sizeof(reg),1,ptr);
+while(!feof(ptr) && reg.IdProd!=IdProd){
+	fread(&reg,sizeof(reg),1,ptr);
+}
+}
+return reg;
+fclose(ptr);
+}
+
+
+
+
+bool verificarProductoEnSucursal(int IdProd,int IdSucursal)
+{
+
+	//cout<<IdProd<<"     "<<obtVentaPorPtoVta(obtPtoVtaPorSucursal(IdSucursal).IdVend).IdProd<<endl;
+	if(IdSucursal == obtPtoVtaPorVenta(obtVentaPorProducto(IdProd).IdVendedor).IdSucursal  ) return true;
+	else return false;
+
+		
+
+}
+
+
+
+int totalcantidadSuc(int IdProd){
+FILE *ptr;
+regVenta reg;
+int suma=0;
+ptr=fopen("venta.dat","rb");
+if(ptr!=NULL){
+fread(&reg,sizeof(reg),1,ptr);
+while(!feof(ptr)){
+	if(reg.IdProd==IdProd) suma+=reg.cantidad;
+	fread(&reg,sizeof(reg),1,ptr);
+}
+}
+fclose(ptr);
+return suma;
+
+}
+
+
+
+void reporte(){
+FILE *ptr;
+FILE *ptrprod;
+float sumatotsuc=0,sumatotsucfinal=0;
+regSucursal reg;
+regProducto rp;
+
+/*
+char fecha1[10],auxfecha1[10];
+char fecha2[10],auxfecha2[10];
+SolicitarFecha(fecha1);
+SolicitarFecha(fecha2);
+*/
+
+ptr=fopen("sucursal.dat","rb");
+ptrprod=fopen("producto.dat","rb");
+
+if(ptr!=NULL){
+	//cout<<fecha1<<"                        "<<fecha2<<endl;
+	cout<<"__________________________________________________________";
+	fread(&reg,sizeof(reg),1,ptr);
+	while(!feof(ptr))
+	{   cout<<endl<<reg.nombre;
+	cout<<endl;
+	fread(&rp,sizeof(rp),1,ptrprod);
+	while(!feof(ptrprod)){
+		if(verificarProductoEnSucursal(rp.IdProd,reg.IdSucursal)) 
+			{cout<<rp.nombre<<"   "<<rp.precio<<"   "<<totalcantidadSuc(rp.IdProd)<<"      "<<rp.precio*totalcantidadSuc(rp.IdProd)<<endl;
+		sumatotsuc+=rp.precio*totalcantidadSuc(rp.IdProd);
+		}
+		fread(&rp,sizeof(rp),1,ptrprod);
+			}	
+	cout<<"total sucursal:  "<<sumatotsuc<<endl;
+	sumatotsucfinal+=sumatotsuc;
+	sumatotsuc=0;
+		fread(&reg,sizeof(reg),1,ptr);
+		fseek(ptrprod,0,SEEK_SET);
+	}
+	cout<<"total de todo: "<<sumatotsucfinal;
+getch();
+}
+fclose(ptr);
+fclose(ptrprod);
+
+}
+
+
+
+
+
+
+
+
+
+
+Tratamiento
+
+void crearArchivotratamiento(char nomArch[15]){
+FILE *ptr;
+ptr=fopen(nomArch,"wb+");
+fclose(ptr);
+}
+
+void solicitarDatostratamiento(regTratamiento *reg){
+	    
+		cout<<"IdTratamiento: ";
+	    cin>>reg->IdTrat;
+	    fflush(stdin);
+
+		cout<<"Nombre de tratamiento: ";
+		do{
+			gets(reg->NomTratamiento);
+		}while(strlen(reg->NomTratamiento)==0);
+		fflush(stdin);
+
+		cout<<"Id Cliente: ";
+		cin>>reg->IdCliente;
+		
+		cout<<"introducir hora de su tratamiento: ";
+		fflush(stdin);
+
+		do{
+		cout<<"introducir hora: ";
+		cin>> reg->hora;
+	    }while(!(reg->hora>=0 && reg->hora<=23));
+		fflush(stdin);
+		
+		do{
+		cout<<"introducir minutos: ";
+		cin>> reg->minutos;
+	    }while(!( reg->minutos>=0 && reg->minutos<=59));
+		fflush(stdin);
+		
+				
+		reg->estado='N';
+
+}
+regCliente ObtNombrexTratamiento(int idCliente){
+  FILE *ptr;
+  regCliente reg;
+  ptr=fopen("cliente.dat","rb");
+if(ptr!=NULL){
+fread(&reg,sizeof(reg),1,ptr);
+while(!feof(ptr) && reg.IdCliente!=idCliente){
+	fread(&reg,sizeof(reg),1,ptr);
+}
+}
+return reg;
+fclose(ptr);
+}
+
+void alarma(regTratamiento reg)
+{
+	FILE *ptr;
+	//int cont=0;
+	ptr = fopen("tratamiento.dat", "rb");
+	regCliente regC;
+
+	// hora del sistema de la cabecera time.h
+	time_t ahora;
+	struct tm *hora;
+
+
+
+	if (ptr != NULL){
+		fread(&reg, sizeof(reg), 1, ptr);
+		time(&ahora);
+		hora = localtime(&ahora);
+
+		cout << "hora: " << hora->tm_hour << ":" << hora->tm_min;
+		while (!feof(ptr) && (reg.hora != hora->tm_hour) && (reg.minutos != hora->tm_min)){
+			fread(&reg, sizeof(reg), 1, ptr);
+			time(&ahora);
+			hora = localtime(&ahora);
+			fread(&reg, sizeof(reg), 1, ptr);
+
+		}
+	}
+	regC = ObtNombrexTratamiento(reg.IdCliente);
+	if (reg.hora == hora->tm_hour && reg.minutos == hora->tm_min){
+
+		cout << endl << "Es hora del tratamiento: " << reg.NomTratamiento << endl<<"del paciente : " << regC.nombre << endl;
+	}
+
+	fclose(ptr);
+}
+
+void mostrarRegistroTratamiento(regTratamiento reg,int nroReg){
+	regCliente regC;
+	regC=ObtNombrexTratamiento(reg.IdCliente);
+	cout<<endl<<nroReg<<".- "<<reg.IdTrat<<"		   "<<reg.NomTratamiento<<"			 "<<regC.nombre <<"			   "<<reg.hora<<":"<<reg.minutos;
+} 
+void adicionarRegistrotratamiento(char nomArch[15]){
+//adiciona un registro al final del archivo
+FILE *ptr;
+ptr=fopen(nomArch,"ab");
+regTratamiento reg;
+solicitarDatostratamiento(&reg);
+fwrite(&reg,sizeof(struct regTratamiento),1,ptr);
+fclose(ptr);
+}
+
+void listarArchivotratamiento(char nomArch[15]){
+//muestra todo contenido del archivo
+FILE *ptr;
+regTratamiento reg;
+int cont=0;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL)cout<<"El archivo no existe...";
+else{
+	system("cls");
+cout<<endl<<"***                  Tratamiento                  ***";
+cout<<endl<<"  IdTratamiento      Nombre/tratamiento      Paciente     Hora:Minuto";
+cout<<endl<<"===============================================================================";
+fread(&reg,sizeof(struct regTratamiento),1,ptr);
+while(!feof(ptr)){
+	if(reg.estado=='N') mostrarRegistroTratamiento(reg,cont+1);
+	fread(&reg,sizeof(struct regTratamiento),1,ptr);
+	cont++;
+}
+fclose(ptr);
+getch ();
+}
+}
+void buscarRegistrotratamiento(char nomArch[15],int nroReg){
+//muestra un registro del contenido del archivo
+FILE *ptr;
+regTratamiento reg;
+ptr=fopen(nomArch,"rb");
+if(ptr==NULL) cout<<"El archivo no existe...";
+else{
+	fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+	fread(&reg,sizeof(struct regTratamiento),1,ptr);
+	if(feof(ptr)) cout<<"registro no existe";
+	else if(reg.estado='N') mostrarRegistroTratamiento(reg,nroReg);
+	else cout<<endl<<"Registro eliminado....";
+fclose(ptr); getch();
+}
+}
+void modificarRegistrotratamiento(char nomArch[15],int nroReg){
+//modificar el contenido d eun registro del archivo
+FILE *ptr;
+regTratamiento reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"el archivo no existe....";
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regTratamiento),1,ptr);
+if(feof(ptr)) cout<<"el registro no existe...";
+else if(reg.estado=='N') {
+mostrarRegistroTratamiento(reg,nroReg);
+cout<<endl;
+solicitarDatostratamiento(&reg);
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regTratamiento),1,ptr);
+}
+else cout<<"Registro Eliminado....";
+fclose(ptr);
+}
+}
+
+void eliminarRegistratamiento(char nomArch[15],int nroReg){
+//elimina un registro del archivo
+FILE *ptr;
+regTratamiento reg;
+ptr=fopen(nomArch,"r+b");
+if(ptr==NULL) cout<<"El archivo no existe..."; 
+else{
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fread(&reg,sizeof(struct regTratamiento),1,ptr);
+if(feof(ptr)) cout<<"registro no existe...";
+else if(reg.estado=='N'){
+mostrarRegistroTratamiento(reg,nroReg);
+reg.estado='S';
+fseek(ptr,(nroReg-1)*sizeof(reg),SEEK_SET);
+fwrite(&reg,sizeof(struct regTratamiento),1,ptr);
+cout<<endl<<"Registro eliminado exitosamente...";
+}
+else cout<<endl<<"Registro YA eliminado...";
+fclose(ptr);
+}
+}
+void menutratamiento(){
+int opcion=0,nreg=0;
+regTratamiento reg;
+do{
+system("cls");
+cout<<"\n** M E N U   T R A T A M I E N T O **"<<endl;
+cout<<"\n1.- crear archivo"<<endl;
+cout<<"\n2.- Adicionar Registro"<<endl;
+cout<<"\n3.- Modificar Registro"<<endl;
+cout<<"\n4.- Eliminar Registro"<<endl;
+cout<<"\n5.- Buscar por numero de registro"<<endl;
+cout<<"\n6.- Listar todo el archivo"<<endl;
+cout<<"\n0.- Salir"<<endl;
+alarma(reg);
+cout<<endl;
+cout<<"opcion: ";
+cin>>opcion;
+switch(opcion){
+case 1: crearArchivotratamiento("tratamiento.dat"); break;
+case 2: adicionarRegistrotratamiento("tratamiento.dat"); break;
+case 3: cout<<"\nIntroducir nro de registro a modificar : "; cin>>nreg; modificarRegistrotratamiento("tratamiento.dat",nreg); break;
+case 4: cout<<"\nIntroducir nro de registro a Eliminar : "; cin>>nreg; eliminarRegistratamiento("tratamiento.dat",nreg);break;
+case 5: cout<<"\nIntroducir nro de registro a Buscar : "; cin>>nreg; buscarRegistrotratamiento("tratamiento.dat",nreg); break;
+case 6: listarArchivotratamiento("tratamiento.dat");break;
+	
+}
+}while(opcion!=0);
+
+}
+
+
+Validación de Fechas
+
+bool verificarProducto(int IdProd){
+	FILE *ptr;
+	regProducto reg;
+	ptr=fopen("producto.dat","rb");
+	fread(&reg,sizeof(reg),1,ptr); if(reg.IdProd==IdProd) return true;
+	while(!feof(ptr)) { fread(&reg,sizeof(reg),1,ptr); if(reg.IdProd==IdProd) {fclose(ptr);return true;}   } 
+	fclose(ptr);
+	return false;
+}
+
+bool verificarCliente(int IdCliente){
+	FILE *ptr;
+	regCliente reg;
+	ptr=fopen("cliente.dat","rb");
+	fread(&reg,sizeof(reg),1,ptr); if(reg.IdCliente==IdCliente) return true;
+	while(!feof(ptr)) { fread(&reg,sizeof(reg),1,ptr); if(reg.IdCliente==IdCliente){ fclose(ptr);return true;}   } 
+	fclose(ptr);
+	return false;
+
+}
+
+bool verificarVendedor(int IdVend){
+	FILE *ptr;
+	regVendedor reg;
+	ptr=fopen("vendedor.dat","rb");
+	fread(&reg,sizeof(reg),1,ptr); 
+	if(reg.IdVend==IdVend) return true;
+	while(!feof(ptr)) { 
+		fread(&reg,sizeof(reg),1,ptr); 
+		if(reg.IdVend==IdVend)
+		{ 
+			fclose(ptr);
+			return true;
+		}
+	} 
+	fclose(ptr);
+	return false;
+}
+regVendedor verificarContrasenha(int idVend){
+  FILE *ptr;
+  regVendedor reg;
+  ptr=fopen("vendedor.dat","rb");
+if(ptr!=NULL){
+fread(&reg,sizeof(reg),1,ptr);
+while(!feof(ptr) && reg.IdVend!=idVend){
+	fread(&reg,sizeof(reg),1,ptr);
+}
+}
+return reg;
+fclose(ptr);
+}
+
+
+bool bisiesto(unsigned int ano){
+	if(((ano%4==0) && (ano%100!=0)) || (ano%400==0)) return true;
+	return false;
+}
+
+enum e{ENERO,FEBRERO,MARZO,ABRIL,MAYO,JUNIO,JULIO,AGOSTO,SEPTIEMBRE,OCTUBRE,NOVIEMBRE,DICIEMBRE};
+
+unsigned int diasdelmes(unsigned int mes,unsigned int ano){
+	unsigned int diasmes;
+		switch(mes){
+		case ENERO:
+		case MARZO: 
+		case MAYO:
+		case JULIO: 
+		case AGOSTO: 
+		case OCTUBRE:
+		case DICIEMBRE: 
+			diasmes=31; break; 
+		case FEBRERO: 
+			if(bisiesto(ano)) diasmes=29; 
+			else diasmes=28;
+			break;
+		case ABRIL: 
+		case JUNIO: 
+		case SEPTIEMBRE: 
+		case NOVIEMBRE: 
+			diasmes=30; break;
+		}
+		return diasmes;
+}
+
+void SolicitarFecha(char fecha[]){
+	unsigned int ano,mes,dia,diasmes;
+	char cano[5],cmes[3],cdia[3];
+	cout<<"introduzca fecha:"<<endl;
+		do{
+		cout<<"a\xa4o: "; cin>>ano;
+		}while(ano>9999);
+		do{
+			cout<<"mes: "; cin>>mes;
+		
+		}while(mes>12);
+		diasmes=diasdelmes(mes-1,ano);
+			do{
+			cout<<"dia: "; cin>>dia;
+		}while(dia>diasmes);
+
+		itoa(dia,cdia,10);
+		itoa(mes,cmes,10);
+		itoa(ano,cano,10);	
+		
+		if(dia<10) {fecha[0]='0';fecha[1]='\0';
+		strcat(fecha,cdia);
+		}
+		else {fecha[0]='\0'; cdia[2]='\0';
+		strcat(fecha,cdia);}
+
+		fecha[2]='//';fecha[3]='\0';
+
+		if(mes<10) {fecha[3]='0';fecha[4]='\0';
+		strcat(fecha,cdia);
+		}
+		else {cmes[2]='\0';strcat(fecha,cdia);}
+
+		fecha[5]='//';fecha[6]='\0';
+		strcat(fecha,cano);
+}
+
+void LeerFecha(char fecha[10],unsigned int &ano,unsigned int &mes,unsigned int &dia){
+	char cano[5],cmes[3],cdia[3];
+
+	cdia[0]=fecha[0];	cdia[1]=fecha[1];	cdia[2]='\0';
+	cmes[0]=fecha[3];	cmes[1]=fecha[4];	cmes[2]='\0';
+	cano[0]=fecha[6];	cano[1]=fecha[7];   cano[2]=fecha[8];	cano[3]=fecha[9];	cano[4]='\0';
+
+	dia=atoi(cdia);
+	mes=atoi(cmes);
+	ano=atoi(cano);
+}
+
+
+bool VerificarRangoFechas(char fecha1[],char fecha2[]){
+		unsigned int ano1,mes1,dia1;
+		unsigned int ano2,mes2,dia2;
+
+		LeerFecha(fecha1,ano1,mes1,dia1);
+		LeerFecha(fecha2,ano2,mes2,dia2);
+		if(ano2<ano1) return false;
+		else if(ano2==ano1){
+			if(mes2<mes1) return false;
+			else if(mes2==mes1) {
+				if(dia2<dia1) return false;
+			}
+
+		}
+		return true;
+}
+
+
+
