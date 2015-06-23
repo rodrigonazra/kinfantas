@@ -1,0 +1,44 @@
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+
+using namespace std;
+
+int main ()
+{
+	int d,m,y,i;
+	bool biciesto = false;
+	// dd/mm/aaaa 
+	string fecha;
+
+	cout<<"introduce la fecha: ";
+	cin>>fecha;
+	d=  fecha[0,1]  //fecha.substr(0,2) //atoi cast
+	if ((y % 4 == 0)&& (y%100!=100)||(y%4==0))
+		biciesto = true;
+	if( (d>0)&&(d<32)&&(m>0)&&(m<13)&&(y>0))
+	{
+		if(m==1||m==3||m==5||m==7||m==8||m==10||m==12)
+		{
+			cout<<"\nes biciesto";
+		}
+		else
+		{
+			if(m==2&& d<30 && biciesto)
+				cout<<"\nfecha valida";
+			else 
+				if(m==2&& d<29 && !biciesto)
+					cout<<"\nfecha valida";
+				else 
+					if(m !=2 && d<31)
+						cout<<"\nfecha valida";
+					else 
+						cout<<"\nfecha no valida";		
+		}
+	}
+	else 
+		cout<<"\nfecha invalida";
+	_getch();
+}
