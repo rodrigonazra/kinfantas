@@ -1,0 +1,89 @@
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+#include <string>
+#define TAM 100
+using namespace std;
+void cargarmatriz(int matriz[TAM][TAM], int n, int m);
+void cargarmatrizb(int matrizb[TAM][TAM], int n, int m);
+void mostrarmatriz(int matriz[TAM][TAM],int n,int m);
+void mostrarmatrizb(int matrizb[TAM][TAM],int n,int m);
+void sumar(int matriz[TAM][TAM],int matrizb[TAM][TAM],int matrizc[TAM][TAM],int n,int m);
+
+void main()
+{ int matriz[TAM][TAM],matrizb[TAM][TAM],matrizc[TAM][TAM],n,m,n1,m1;
+cout<<"introduzca el numero de filas de la matriz a\n";
+cin>>n;
+cout<<"introduzca el numero de columnas de la matriz a \n";
+cin>>m;
+cout<<"introduzca el numero de filas de la matriz b\n";
+cin>>n1;
+cout<<"introduzca el numero de columnas de la matriz b \n";
+cin>>m1;
+if( n==n1 &&  m==m1)
+{cargarmatriz(matriz,n,m);
+cargarmatrizb(matrizb,n,m);
+cout<<"--------MATRIZ A-----\n";
+mostrarmatriz(matriz,n,m);
+cout<<"--------MATRIZ B-----\n";
+mostrarmatrizb(matrizb,n,m);
+cout<<"--------MATRIZ (SUMA) C-----\n";
+sumar(matriz,matrizb,matrizc,n,m);
+}
+else
+cout<<"La matriz no se puede sumar\n";
+_getch();
+}
+void cargarmatriz(int matriz[TAM][TAM], int n, int m)
+{ 
+	
+	for(int i=1;i<=n;i++)
+    { for(int k=1; k<=m;k++)
+
+			{ cout<<"Introduzca el elemento ["<<i<<","<<k<<"] de la matriz A \n";
+				 cin>>matriz[i][k];
+			}	 
+	}	
+
+}
+void cargarmatrizb(int matriz[TAM][TAM], int n, int m)
+{ 
+	
+	for(int i=1;i<=n;i++)
+    { for(int k=1; k<=m;k++)
+
+			{ cout<<"Introduzca el elemento ["<<i<<","<<k<<"] de la matriz B \n";
+				 cin>>matriz[i][k];
+			}	   
+	}
+}
+void mostrarmatriz(int matriz[TAM][TAM],int n,int m)
+{ 
+	for(int i=1;i<=n;i++)
+	{cout<<"\n";
+		for(int k=1;k<=m;k++)
+		cout<<" "<<matriz[i][k];
+
+}
+	cout<<"\n"; 
+}
+void mostrarmatrizb(int matrizb[TAM][TAM],int n,int m)
+{ 
+	for(int i=1;i<=n;i++)
+	{cout<<"\n";
+		for(int k=1;k<=m;k++)
+		cout<<" "<<matrizb[i][k]; 
+
+		}		
+	cout<<"\n"; 
+}
+void sumar(int matriz[TAM][TAM],int matrizb[TAM][TAM],int matrizc[TAM][TAM],int n,int m)
+{     for(int i=1;i<=n;i++)
+	{	cout<<"\n";
+		for(int k=1;k<=m;k++)
+		{matrizc[i][k]=matriz[i][k]+matrizb[i][k];
+		cout<<" "<<matrizc[i][k];
+		}
+
+	}
+}
