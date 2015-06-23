@@ -1,0 +1,221 @@
+#include "stdafx.h"
+#include "stdio.h"
+#include "conio.h"
+#include <string>
+#include <iostream>
+
+
+using namespace std;
+
+
+struct tipo_contacto
+{
+	int idAmigo;
+	string nombre;
+	string apellido;
+	int edad;
+	string categoria;
+};
+
+tipo_contacto Contacto;
+
+FILE*alias;
+
+
+void menu();
+bool ALTA_SECUENCIAL();
+void LISTADO_SECUENCIAL();
+void cargarVector(tipo_contacto v[], int &n);
+void clasificarburbuja(tipo_contacto v[], int &n);
+void MODIFICACION_SECUENCIAL(tipo_contacto v[], int n);
+
+int main()
+{
+	tipo_contacto v[60] = {};
+	int n = 0;
+	system("cls");
+	int opcion = 9;
+	while (opcion != 0){
+		menu();
+		cin >> opcion;
+
+		switch (opcion){
+		case 1:
+			LISTADO_SECUENCIAL();
+			system("pause");
+			break;
+		case 2:
+			if (ALTA_SECUENCIAL())
+			{
+				cout << "Inserto Corectamente \n";
+			}
+			else{
+				cout << "No se Inserto \n";
+			}
+			system("pause");
+			break;
+		case 3:
+			cargarVector(v, n);
+			clasificarburbuja(v, n);
+			MODIFICACION_SECUENCIAL(v, n);
+
+			system("pause");
+			break;
+
+		default:
+			printf("\nOpcion Incorrecta!!\n");
+			system("pause");
+			break;
+		}
+
+	}
+}
+
+void menu(){
+	system("cls");
+	printf("Menu ");
+	printf("\n 1.- Mostrar Contatos");
+	printf("\n 2.- Insertar Contactos");
+	printf("\n 3.- Ordenar por edad");
+	printf("\n\n   OPCION #: ");
+}
+
+bool ALTA_SECUENCIAL()
+{
+	int idAmigo; 
+
+	cout << "\n\n\n\rALTAS DE CONTACTOS";
+	cout << "\n\n\n\rNumero de contacto: ";
+	cin >> idAmigo;
+	cin.ignore();
+
+	alias = fopen("AMIGOS.DAT", "rb+");
+	if (alias == NULL)
+	{
+		alias = fopen("AMIGOS.DAT", "wb"); 
+	}
+	else
+	{
+		fread(&Contacto, sizeof(Contacto), 1, alias);
+		
+		while (!feof(alias))
+		{
+			if (Contacto.idAmigo == idAmigo)
+			{
+				cout << "\n\n\n\rContacto ya existe!!! \n";
+				fclose(alias);
+				return false;
+			}
+			fread(&Contacto, sizeof(Contacto), 1, alias);
+		}
+
+		fclose(alias);
+		alias = fopen("AMIGOS.DAT", "ab");
+	}
+
+	
+	cout << "\n\rNombre : ";
+	getline(cin, Contacto.nombre);
+	cout << "\n\rApellido : ";
+	getline(cin, Contacto.apellido);
+	cout << "\n\rEdad : ";
+	cin >> Contacto.edad;
+	Contacto.idAmigo = idAmigo;
+	fwrite(&Contacto, sizeof(Contacto), 1, alias);
+	fclose(alias); 
+	cout << "\n\n\n\rContacto registrado !!!";
+
+	return true;
+}
+
+void LISTADO_SECUENCIAL(void)
+{
+	cout << "\n\rLISTADO DE CONTACTOS";
+	alias = fopen("AMIGOS.DAT", "rb"); 
+	if (alias == NULL)
+	{
+		cout << "\n\n\n\rNo existe el archivo !!!";
+		cout << "\n\r<<< Oprima cualquier tecla para continuar >>>";
+		return;
+	}
+	cout << "\n\ridAmigo Nombre Apellido edad";
+	cout << "\n\r------------------------------------------------------------------------ \n";
+	fread(&Contacto, sizeof(Contacto), 1, alias);
+	
+	while (!feof(alias)) 
+	{
+
+		cout << Contacto.idAmigo << " " << Contacto.nombre << " " << Contacto.apellido << " " << Contacto.edad << " " << Contacto.categoria << "\n";
+		fread(&Contacto, sizeof(Contacto), 1, alias);
+	}
+	fclose(alias); 
+	cout << "\r------------------------------------------------------------------------";
+	cout << "\n\rFin del listado !!!";
+	cout << "\n\r<<< Oprima cualquier tecla para continuar >>>";
+	return;
+}
+
+void cargarVector(tipo_contacto v[], int &n){ 
+	cout << "\n\rcargar vector";
+	alias = fopen("AMIGOS.DAT", "rb");	
+
+	fread(&Contacto, sizeof(Contacto), 1, alias);
+
+	int i = 0;
+	while (!feof(alias)) 
+	{
+		v[i] = Contacto;		
+		fread(&Contacto, sizeof(Contacto), 1, alias);
+		i++;
+	}
+	n = i;
+	fclose(alias); 	
+	return;
+}
+
+void clasificarburbuja(tipo_contacto v[], int &n){
+	int i, j;
+	tipo_contacto temp;
+	for (int i = 1; i < n; i++){
+		for (int j = 0; j < n - 1; j++){
+			if (v[j].edad > v[j + 1].edad){		
+				temp = v[j];
+				v[j] = v[j + 1];
+				v[j + 1] = temp;
+			}
+		}
+	}
+	string mensaje = "entro metodo ordenar burbuja con vector";
+	cout << mensaje;
+}
+
+void MODIFICACION_SECUENCIAL(tipo_contacto v[], int n)
+{
+	int i = 0;
+	cout << "\n\rMODIFICACION DE REGISTROS DE CONTACTOS";
+	alias = fopen("AMIGOS.DAT", "rb+"); 
+
+
+	
+	while (!feof(alias) && i != n) 
+		fread(&Contacto, sizeof(Contacto), 1, alias);
+		Contacto.idAmigo = v[i].idAmigo;
+		Contacto.nombre = v[i].nombre;
+		Contacto.apellido = v[i].apellido;
+		Contacto.edad = v[i].edad;
+		Contacto.categoria = v[i].categoria;
+
+		if (i < n){
+			fseek(alias, i * sizeof(Contacto), SEEK_SET);
+			fwrite(&Contacto, sizeof(Contacto), 1, alias); 			
+		}
+
+		i++;
+
+
+	}
+	fclose(alias); 
+	cout << "\n\r<<< Oprima cualquier tecla para continuar >>>";
+	getchar();
+	return;
+}
