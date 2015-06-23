@@ -1,0 +1,31 @@
+//Rodrigo Nazra
+
+
+struct tvector{
+	int k;
+	int subvec[30];
+};
+
+void cargar(tvector vec[], int n)
+{int i,j;
+ for(i=0;i<n;i++)
+	{
+	 cout<<"nro de elementos subvector: ";
+	 cin>>vec[i].k;
+	 for(j=0;j<vec[i].k;j++)
+		{
+			cout<<"elemento: ";
+			cin>>vec[i].subvec[j];
+		}
+	}
+}
+
+
+void mostrar(tvector vec[],int n){
+	int i,j;
+	for(i=0;i<n;i++){
+		for(j=0;j<vec[i].subvec[j]<<" "
+	}
+	cout<<endl;
+	
+}
