@@ -1,0 +1,25 @@
+#include "stdafx.h"
+#include "math.h"
+#include < iostream >
+#include "conio.h"
+using namespace std;
+
+void main()
+{ float A,B,C,D,E,F,x,y;
+cout<<"Ingrese las variables de la primera ecuacion;\n";cin>>A>>B>>C;
+cout<<"Ingrese las variables de la segunda ecuacion;\n";cin>>D>>E>>F;
+if(A != D && B != E)
+{	y=(D*C-A*F)/(B*D-A*E);
+	x=(C-B*y)/A;
+cout<<"El valor de x es:\n"<<x;
+cout<<"\n";
+cout<<"El valor de y es:\n"<<y;
+}
+else
+{	cout<<"Las dos rectas no se intersectan entre si:\n";
+}
+_getch();
+}
+
+
+ 
