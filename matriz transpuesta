@@ -1,0 +1,58 @@
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+#include <string>
+#define TAM 100
+using namespace std;
+
+
+void cargarmatriz(int matriz[TAM][TAM], int n, int m);
+void mostrarmatriz(int matriz[TAM][TAM],int n,int m);
+void transponer(int matriz[TAM][TAM],int n,int m);
+
+
+void main()
+{ int matriz[TAM][TAM], n,m;
+cout<<"introduzca el numero de filas de la matriz\n";
+cin>>n;
+cout<<"introduzca el numero de columnas de la matriz\n";
+cin>>m;
+cargarmatriz(matriz,n,m);
+mostrarmatriz(matriz,n,m);
+transponer(matriz,n,m);
+_getch();
+}
+
+
+void cargarmatriz(int matriz[TAM][TAM], int n, int m)
+{ 
+	
+	for(int i=1;i<=n;i++)
+    { for(int k=1; k<=m;k++)
+
+			{ cout<<"Introduzca el elemento ["<<i<<","<<k<<"]\n";
+				 cin>>matriz[i][k];
+			}	 
+	}	  
+
+}
+void mostrarmatriz(int matriz[TAM][TAM],int n,int m)
+{  cout<<"\n---------La matriz sin transponer es --------\n\n";
+	for(int i=1;i<=n;i++)
+	{cout<<"\n";
+		for(int k=1;k<=m;k++)
+		cout<<" "<<matriz[i][k]; 
+
+}
+
+}
+void transponer(int matriz[TAM][TAM],int n,int m)
+{	cout<<"\n---------La matriz transpuesta es --------\n\n";
+		for(int i=1;i<=m;i++)
+			{cout<<"\n";
+				for(int k=1;k<=n;k++)
+					cout<<" "<<matriz[k][i]; 
+			}
+
+
+}
