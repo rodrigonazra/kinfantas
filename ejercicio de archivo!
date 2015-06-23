@@ -1,0 +1,276 @@
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#include "iomanip"
+#include <string>
+
+using namespace std;
+
+#define MAX 30
+
+
+struct producto
+{
+	int idprod;
+	string nombre;
+	int PU;
+};
+
+struct vehiculo
+{
+	string idvehiculo;
+	int idcliente;
+};
+
+struct venta
+{
+	int idventa;
+	string fecha;
+	int cantidad;
+	int idprod;
+	int PU;
+	string idvehiculo;
+};
+
+struct reporte
+{
+	string idvehiculo;
+	string producto;
+	int cantAcum;
+	int PU;
+};
+
+void mostrarProd (void)
+
+;
+void mostrarVentas (void);
+void copiarProducto(producto P[], int &np);
+void reporteVentas (producto P[], int &np, string f1, string f2);
+void copiaVentas (venta VE[], int &nve, string f1, string f2);
+bool atras (string id, reporte R[], int nr);
+string buscarNomPro (int id, producto P [], int np);
+void mostrarReporte (reporte R[], int nr);
+
+
+
+
+
+void main (void)
+{
+	FILE *p1;
+	FILE *p2;
+	char op;
+	producto reg;
+	
+	do {
+		p1 = fopen ("producto.dat", "ab+");
+		cout << "\nidProd: ";
+		cin >> reg.idprod;
+		cout << "\nNombre: ";
+		cin.ignore ();
+		getline (cin, reg.nombre);
+		cout << "\nPU: ";
+		cin >> reg.PU;
+		fwrite (&reg, sizeof (producto), 1, p1);
+		fclose (p1);
+		cout << "\nContinuar S/N: ";
+		cin >> op;
+	}while(op == 's');
+	
+	mostrarProd ();
+	venta regV;
+	do {
+		p2 = fopen ("venta.dat", "ab+");
+		cout << "\nidVenta: ";
+		cin >> regV.idventa;
+		cout << "\nFecha: ";
+		cin.ignore ();
+		getline (cin, regV.fecha);
+		cout << "\nCantidad: ";
+		cin >> regV.cantidad;
+		cout << "PU: ";
+		cin >> regV.PU;
+		cout << "\nidVehiculo: ";
+		cin.ignore ();
+		getline (cin, regV.idvehiculo);
+		cout << "\nidProd: ";
+		cin >> regV.idprod;
+		fwrite (&regV, sizeof (venta), 1, p2);
+		fclose (p2);
+		cout << "\nContinuar S/N: ";
+		cin >> op;
+	}while(op == 's');
+	
+	mostrarVentas ();
+	int np = 0;
+	producto P[MAX];
+	string f1, f2;
+	copiarProducto (P, np);
+	cout << "\n\nFecha 1: ";
+	cin.ignore ();
+	getline (cin, f1);
+	cout << "\nFecha 2: ";
+	getline (cin, f2);
+	reporteVentas (P, np, f1, f2);
+}
+
+void mostrarProd (void)
+{
+	FILE *alias;
+	producto reg;
+	alias = fopen ("producto.dat", "rb");
+	if (alias == NULL)
+	{
+		cout << "No Existe Archivo";
+		return;
+	}
+	fread (&reg, sizeof (producto), 1, alias);
+	while (!feof (alias))
+	{
+		cout << reg.idprod << "   " << reg.nombre << "   " << reg.PU << endl;
+		fread (&reg, sizeof (producto), 1, alias);
+	}
+	fclose (alias);
+	_getch ();
+}
+
+void mostrarVentas (void)
+{
+	FILE *alias;
+	venta reg;
+	alias = fopen ("venta.dat", "rb");
+	if (alias == NULL)
+	{
+		cout << "No Existe Archivo";
+		return;
+	}
+	fread (&reg, sizeof (venta), 1, alias);
+	while (!feof (alias))
+	{
+		cout << reg.idventa << "   " << reg.fecha << "   " << reg.cantidad << "   " << reg.PU << "   " << reg.idvehiculo << "   " << reg.idprod << endl;
+		fread (&reg, sizeof (venta), 1, alias);
+	}
+	fclose (alias);
+	_getch ();
+}
+
+void copiarProducto(producto P[], int &np)
+{
+	FILE *alias;
+	producto reg;
+	alias = fopen ("producto.dat", "rb");
+	if (alias == NULL)
+	{
+		cout << "No Existe Archivo";
+		return;
+	}
+	fread (&reg, sizeof (producto), 1, alias);
+	np = 0;
+	while (!feof (alias))
+	{
+		P[np] = reg;
+		np++;
+		fread (&reg, sizeof (producto), 1, alias);
+	}
+	fclose (alias);
+}
+
+void reporteVentas (producto P[], int &np, string f1, string f2)
+{
+	bool sw;
+	string nom;
+	venta VE [MAX];
+	int nve = 0;
+	copiaVentas (VE, nve, f1, f2);
+	
+	reporte R [MAX];
+	int nr = 0;
+	int i = 0, j, s;
+	while (i < nve)
+	{
+		sw = atras (VE[i].idvehiculo, R, nr);
+		if (sw == true)
+			i++;
+		else
+		{
+			s = VE[i].cantidad;
+			j = i + 1;
+			while (j < nve)
+			{
+				if (VE[i].idvehiculo == VE[j].idvehiculo)
+					s = s + VE[i].cantidad;
+				j++;
+
+			}
+			R[nr].idvehiculo = VE[i].idvehiculo;
+			nom = buscarNomPro (VE[i].idprod, P, np);
+			R[nr].producto = nom;
+			R[nr].cantAcum = s;
+			R[nr].PU = VE[i].PU;
+			nr++;
+			i++;
+		}		
+	}
+	mostrarReporte (R, nr);
+}
+
+void copiaVentas (venta VE[], int &nve, string f1, string f2)
+{
+	FILE *alias;
+	venta reg;
+	alias = fopen ("venta.dat", "rb");
+	if (alias == NULL)
+	{
+		cout << "No Existe Archivo";
+		return;
+	}
+	fread (&reg, sizeof (venta), 1, alias);
+	nve = 0;
+	while (!feof (alias))
+	{
+		if ((reg.fecha.compare (f1) >= 0) && (reg.fecha.compare (f2) <= 0))
+		{
+			VE[nve] = reg;
+			nve++;
+		}
+		fread (&reg, sizeof (venta), 1, alias);
+	}
+	fclose (alias);
+}
+
+bool atras (string id, reporte R[], int nr)
+{
+	int i;
+	bool sw = false;
+	for (i = 0; i < nr; i++)
+	{
+		if (R[i].idvehiculo.compare (id))
+			sw = true;
+	}
+	return (sw);
+}
+
+string buscarNomPro (int id, producto P [], int np)
+{
+	int i;
+	string nom = "";
+	for (i = 0; i < np; i++)
+	{
+		if (P[i].idprod == id)
+			nom = P[i].nombre;
+	}
+	return (nom);
+}
+
+void mostrarReporte (reporte R[], int nr)
+{
+	int i, s = 0;
+	cout << "Reporte Ventas\n\n";
+	for (i = 0; i < nr; i++)
+	{
+		cout << i + 1 << "   " << R[i].idvehiculo << "   " << R[i].producto << "   " << R[i].cantAcum << "   " << R[i].PU << "   " << R[i].cantAcum * R[i].PU << endl;
+		s = s + R[i].cantAcum * R[i].PU;
+	}
+	cout << "Total = " << s;
+	_getch ();
+}
